@@ -1,0 +1,18 @@
+.cool-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #008CBA; /* blue */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cool-button:hover {
+    background-color: #4CAF50; /* green */
+  }
+  
+  .cool-button.pressed {
+    background-color: #f44336; /* red */
+  }
+  
