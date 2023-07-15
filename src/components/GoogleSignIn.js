@@ -15,7 +15,7 @@ const GoogleSignIn = ({ setUser }) => {
     const initGoogleSignIn = () => {
       if (window.google && window.google.accounts) {
         window.google.accounts.id.initialize({
-          client_id: "845464112864-v3o86f5qj5mpbt4jf7qf8ji2p6qjj6lt.apps.googleusercontent.com",
+          client_id: "256085796589-ndlecbmnhf04v89v80esj688tmi3baqh.apps.googleusercontent.com",
           callback: handleCallbackResponse,
         });
 
