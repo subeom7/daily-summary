@@ -9,15 +9,13 @@ function App() {
 
   const handleImageError = (e) => {
     e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
-    e.target.src = "https://path/to/your/default/image.png";
+    e.target.src = "https://cdn1.iconfinder.com/data/icons/user-fill-icons-set/144/User003_Error-512.png";
   };
 
   function handleSignOut(event) {
     setUser({});
     document.getElementById("signInDiv").hidden = false;
   }
-
-
 
   return (
     <div style={{ display: "flex", top: "10px", left: "200 px" }}>
