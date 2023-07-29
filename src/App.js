@@ -6,6 +6,8 @@ import { useState } from "react";
 function App() {
 
   const [user, setUser] = useState({});
+  const [isKoreanHallyuChecked, setIsKoreanHallyuChecked] = useState(false);
+  const [isSendDailyUpdatesClicked, setIsSendDailyUpdatesClicked] = useState(false);
 
   const handleImageError = (e) => {
     e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
@@ -20,6 +22,23 @@ function App() {
   return (
     <div style={{ display: "flex", top: "10px", left: "200 px" }}>
         <GoogleSignIn setUser={setUser} />
+
+        {user && Object.keys(user).length !== 0 && (
+          <div style={{ position: "absolute", top: "10px", left: "50%", transform: "translateX(-50%)" }}>
+            <input
+              type="checkbox"
+              checked={isKoreanHallyuChecked}
+              onChange={(e) => setIsKoreanHallyuChecked(e.target.checked)}
+            />
+            <label>Korean Hallyu</label>
+            <button
+              className={styles.button}
+              onClick={() => setIsSendDailyUpdatesClicked(true)}
+            >
+              Send daily updates
+            </button>
+          </div>
+        )}
 
         <div className="App">
           {user && (
@@ -46,7 +65,7 @@ function App() {
             </div>
           )}
         </div>
-        </div>
+    </div>
   );
 }
 
