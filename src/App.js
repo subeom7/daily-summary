@@ -2,6 +2,7 @@ import './App.css';
 import GoogleSignIn from "./components/GoogleSignIn";
 import styles from "./components/Button.module.css";
 import { useState } from "react";
+import axios from 'axios';
 
 function App() {
 
@@ -31,9 +32,21 @@ function App() {
               onChange={(e) => setIsKoreanHallyuChecked(e.target.checked)}
             />
             <label>Korean Hallyu</label>
+            
             <button
               className={styles.button}
-              onClick={() => setIsSendDailyUpdatesClicked(true)}
+              onClick={() => {
+                setIsSendDailyUpdatesClicked(true);
+                if (isKoreanHallyuChecked) {
+                  axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
+                    .then(res => {
+                      console.log(res.data);
+                    })
+                    .catch(err => {
+                      console.error(err);
+                    });
+                }
+              }}
             >
               Send daily updates
             </button>
