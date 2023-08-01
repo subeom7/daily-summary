@@ -25,33 +25,44 @@ function App() {
         <GoogleSignIn setUser={setUser} />
 
         {user && Object.keys(user).length !== 0 && (
-          <div style={{ position: "absolute", top: "10px", left: "50%", transform: "translateX(-50%)" }}>
+        <div style={{ 
+          position: "absolute", 
+          top: "10px", 
+          left: "50%", 
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}>
+          <div>
             <input
               type="checkbox"
               checked={isKoreanHallyuChecked}
               onChange={(e) => setIsKoreanHallyuChecked(e.target.checked)}
             />
             <label>Korean Hallyu</label>
-            
-            <button
-              className={styles.button}
-              onClick={() => {
-                setIsSendDailyUpdatesClicked(true);
-                if (isKoreanHallyuChecked) {
-                  axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
-                    .then(res => {
-                      console.log(res.data);
-                    })
-                    .catch(err => {
-                      console.error(err);
-                    });
-                }
-              }}
-            >
-              Send daily updates
-            </button>
           </div>
-        )}
+          
+          <button
+            className={styles.button}
+            onClick={() => {
+              setIsSendDailyUpdatesClicked(true);
+              if (isKoreanHallyuChecked) {
+                axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
+                  .then(res => {
+                    console.log(res.data);
+                  })
+                  .catch(err => {
+                    console.error(err);
+                  });
+              }
+            }}
+          >
+            Send daily updates
+          </button>
+        </div>
+      )}
+
 
         <div className="App">
           {user && (
