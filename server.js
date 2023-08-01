@@ -8,6 +8,8 @@ require('dotenv').config();
 
 const port = 5000;
 
+const connectionString = process.env.MONGO_CONNECTION
+
 app.use(cors());
 app.use(express.json()); // Built-in middleware to parse incoming json
 
