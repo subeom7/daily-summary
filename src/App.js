@@ -8,10 +8,11 @@ function App() {
 
   const [user, setUser] = useState({});
   const [isKoreanHallyuChecked, setIsKoreanHallyuChecked] = useState(false);
+  const [isTechnologyChecked, setIsTechnologyChecked] = useState(false); // New state
   const [isSendDailyUpdatesClicked, setIsSendDailyUpdatesClicked] = useState(false);
 
   const handleImageError = (e) => {
-    e.target.onerror = null; // Prevent infinite loop if the default image URL also fails
+    e.target.onerror = null;
     e.target.src = "https://cdn1.iconfinder.com/data/icons/user-fill-icons-set/144/User003_Error-512.png";
   };
 
@@ -42,24 +43,50 @@ function App() {
             />
             <label>Korean Hallyu</label>
           </div>
-          
+
+          <div>
+            <input
+              type="checkbox"
+              checked={isTechnologyChecked}
+              onChange={(e) => setIsTechnologyChecked(e.target.checked)}
+            />
+            <label>Technology</label>
+          </div>
+
           <button
-            className={styles.button}
-            onClick={() => {
-              setIsSendDailyUpdatesClicked(true);
-              if (isKoreanHallyuChecked) {
+          className={styles.button}
+          onClick={() => {
+            setIsSendDailyUpdatesClicked(true);
+            axios.post('http://localhost:5000/saveUser', {
+            email: user.email,
+            categories: [
+              isKoreanHallyuChecked ? 'Korean Hallyu' : null,
+              isTechnologyChecked ? 'Technology' : null,
+            ].filter(Boolean),
+            })
+            .then(() => {
+              if (isKoreanHallyuChecked || isTechnologyChecked) {
                 axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
-                  .then(res => {
-                    console.log(res.data);
-                  })
-                  .catch(err => {
-                    console.error(err);
-                  });
+                .then(res => {
+                  console.log(res.data);
+                })
+                .catch(err => {
+                  console.error(err);
+                });
               }
-            }}
-          >
-            Send daily updates
-          </button>
+            })
+            .catch(err => {
+              if (err.response.status === 400) {
+                console.error('Invalid data format');
+              } else {
+                console.error('Error saving user');
+              }
+            });
+          }}
+        >
+          Send daily updates
+        </button>
+
         </div>
       )}
 
