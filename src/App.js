@@ -8,7 +8,7 @@ function App() {
 
   const [user, setUser] = useState({});
   const [isKoreanHallyuChecked, setIsKoreanHallyuChecked] = useState(false);
-  const [isTechnologyChecked, setIsTechnologyChecked] = useState(false); // New state
+  const [isTechnologyChecked, setIsTechnologyChecked] = useState(false);
   const [isSendDailyUpdatesClicked, setIsSendDailyUpdatesClicked] = useState(false);
 
   const handleImageError = (e) => {
@@ -54,38 +54,39 @@ function App() {
           </div>
 
           <button
-          className={styles.button}
-          onClick={() => {
-            setIsSendDailyUpdatesClicked(true);
-            axios.post('http://localhost:5000/saveUser', {
-            email: user.email,
-            categories: [
-              isKoreanHallyuChecked ? 'Korean Hallyu' : null,
-              isTechnologyChecked ? 'Technology' : null,
-            ].filter(Boolean),
-            })
-            .then(() => {
-              if (isKoreanHallyuChecked || isTechnologyChecked) {
-                axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
-                .then(res => {
-                  console.log(res.data);
-                })
-                .catch(err => {
-                  console.error(err);
-                });
-              }
-            })
-            .catch(err => {
-              if (err.response.status === 400) {
-                console.error('Invalid data format');
-              } else {
-                console.error('Error saving user');
-              }
-            });
-          }}
-        >
-          Send daily updates
-        </button>
+            className={styles.button}
+            onClick={() => {
+              setIsSendDailyUpdatesClicked(true);
+              axios.post('http://localhost:5000/saveUser', {
+                email: user.email,
+                categories: [
+                  isKoreanHallyuChecked ? 'Korean Hallyu' : null,
+                  isTechnologyChecked ? 'Technology' : null,
+                ].filter(Boolean),
+              })
+              .then(() => {
+                if (isKoreanHallyuChecked || isTechnologyChecked) {
+                  axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
+                  .then(res => {
+                    console.log(res.data);
+                    window.location.reload(); // refresh the page upon button click
+                  })
+                  .catch(err => {
+                    console.error(err);
+                  });
+                }
+              })
+              .catch(err => {
+                if (err.response.status === 400) {
+                  console.error('Invalid data format');
+                } else {
+                  console.error('Error saving user');
+                }
+              });
+            }}
+          >
+            Send daily updates
+          </button>
 
         </div>
       )}
