@@ -2,13 +2,19 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const schedule = require('node-schedule');
 const app = express();
+const sgMail = require('@sendgrid/mail')
 
 require('dotenv').config();
 
 const port = 5000;
 
+const API_KEY = process.env.API_KEY
+
 const connectionString = process.env.MONGO_CONNECTION
+
+sgMail.setApiKey(API_KEY)
 
 // Mongoose connection
 mongoose.connect(connectionString, {
@@ -27,6 +33,19 @@ const userSchema = new Schema({
 });
 
 const User = model('User', userSchema);
+
+//testing, needs to be sent to every email stored in database in the future
+const message = {
+  to: 'subeom7@vt.edu',
+  from: 'subeom7@vt.edu',
+  subject: 'Hello from sendGrid',
+  text: 'Hello from sendGrid',
+  html: '<h1>Hello from sendGrid</h1>'
+}
+
+sgMail.send(message)
+.then(response => console.log('Email Sent!'))
+.catch(error => console.log(err.message))
 
 app.use(cors());
 app.use(express.json()); // Built-in middleware to parse incoming json
@@ -97,6 +116,40 @@ app.post('/sendEmail', async (req, res) => {
 
   res.send('Email sent!');
 });
+
+// async function sendDailyUpdates() {
+//   try {
+//     const users = await User.find({});
+
+//     for (const user of users) {
+//       const categories = user.categories.join('\n');
+//       let transporter = nodemailer.createTransport({
+//         service: 'gmail',
+//         auth: {
+//           user: process.env.GMAIL_USER,
+//           pass: process.env.GMAIL_PASS
+//         }
+//       });
+
+//       try {
+//         await transporter.sendMail({
+//           from: '"SK" <subeomkwon@gmail.com>',
+//           to: user.email,
+//           subject: "Your Subscribed Categories",
+//           text: categories,
+//           html: `<b>${categories.replace(/\n/g, '<br>')}</b>`,
+//         });
+//       } catch (error) {
+//         console.error(error);
+//       }
+//     }
+//   } catch (err) {
+//     console.error(err);
+//   }
+// }
+
+// Schedule the sendDailyUpdates function to run at 6:00 PM every day
+// schedule.scheduleJob('0 15 * * *', sendDailyUpdates);
 
 app.listen(port, () => {
   console.log(`Server started and listening on port ${port}`)
