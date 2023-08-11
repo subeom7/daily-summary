@@ -118,7 +118,7 @@ app.post('/saveUser', async (req, res) => {
 // });
 
 //-----------------------------------------------------------
-const job = schedule.scheduleJob('0 14 * * *', function() {
+const job = schedule.scheduleJob('0 8 * * *', function() {
   sendDailyUpdates();
 });
 
