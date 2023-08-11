@@ -9,7 +9,7 @@ function App() {
   const [user, setUser] = useState({});
   const [isKoreanHallyuChecked, setIsKoreanHallyuChecked] = useState(false);
   const [isTechnologyChecked, setIsTechnologyChecked] = useState(false);
-  const [isSendDailyUpdatesClicked, setIsSendDailyUpdatesClicked] = useState(false);
+  // const [isSendDailyUpdatesClicked, setIsSendDailyUpdatesClicked] = useState(false);
 
   const handleImageError = (e) => {
     e.target.onerror = null;
@@ -56,7 +56,6 @@ function App() {
           <button
             className={styles.button}
             onClick={() => {
-              setIsSendDailyUpdatesClicked(true);
               axios.post('http://localhost:5000/saveUser', {
                 email: user.email,
                 categories: [
@@ -66,14 +65,7 @@ function App() {
               })
               .then(() => {
                 if (isKoreanHallyuChecked || isTechnologyChecked) {
-                  axios.post('http://localhost:5000/sendEmail', { userEmail: user.email })
-                  .then(res => {
-                    console.log(res.data);
-                    window.location.reload(); // refresh the page upon button click
-                  })
-                  .catch(err => {
-                    console.error(err);
-                  });
+                  window.location.reload(); // refresh the page upon button click
                 }
               })
               .catch(err => {
@@ -85,7 +77,7 @@ function App() {
               });
             }}
           >
-            Send daily updates
+            Subscribe for daily updates
           </button>
 
         </div>
