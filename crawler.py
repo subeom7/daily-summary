@@ -6,11 +6,19 @@ from collections import deque
 from urllib.parse import urljoin
 import zipfile
 
+from langdetect import detect 
+
 # Set seed URLs and keywords
 seed_urls = [
-    "https://www.google.com/search?sca_esv=557654684&sxsrf=AB5stBj5VHazSwMlDsOFwe1WNrVHW35bfQ:1692235901197&q=hallyu&tbm=nws&source=lnms&sa=X&sqi=2&ved=2ahUKEwjwiJH-xeKAAxWPa_UHHVaHDOgQ0pQJegQIDRAB&biw=2752&bih=1035&dpr=1.25",
+    "https://www.google.com/search?q=hallyu&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBgKqi21sC-tjyvGvq0HPlkOVtxNkg%3A1692328603589&ei=m-LeZJvLI6-A2roP3sejiAE&ved=0ahUKEwjbhIqqn-WAAxUvgFYBHd7jCBEQ4dUDCA0&uact=5&oq=hallyu&gs_lp=Egxnd3Mtd2l6LW5ld3MiBmhhbGx5dTIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABEirHVDlBljfGnAEeACQAQGYAf4BoAGoC6oBBjAuMTEuMbgBA8gBAPgBAagCAMICCxAAGIAEGLEDGIMBwgIEEAAYA8ICCBAAGIAEGLEDwgIIEAAYigUYkQLCAgcQABiABBgKiAYB&sclient=gws-wiz-news",
+    "https://www.google.com/search?q=korean+wave&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBic0jwmONmUIu0lf5sm4xr7dTXMLg%3A1692328618222&ei=quLeZIyHDaul2roPmeeA2Ag&ved=0ahUKEwiMhIexn-WAAxWrklYBHZkzAIsQ4dUDCA0&uact=5&oq=korean+wave&gs_lp=Egxnd3Mtd2l6LW5ld3MiC2tvcmVhbiB3YXZlMgUQABiABDIFEAAYgAQyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAESPUMULMEWO4LcAF4AJABAJgBd6ABmAmqAQMyLjm4AQPIAQD4AQGoAgCIBgE&sclient=gws-wiz-news",
+    "https://www.google.com/search?q=k-pop&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBgsC_77yOw8R70ZByovNpPsW9l_PQ%3A1692328635175&ei=u-LeZJufCrTd2roP0KWfsAw&ved=0ahUKEwjb6JG5n-WAAxW0rlYBHdDSB8YQ4dUDCA0&uact=5&oq=k-pop&gs_lp=Egxnd3Mtd2l6LW5ld3MiBWstcG9wMggQABiKBRiRAjIIEAAYigUYkQIyBxAAGIoFGEMyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgARI5yFQmwpYvh5wA3gAkAEAmAF8oAGRB6oBAzAuOLgBA8gBAPgBAagCAIgGAQ&sclient=gws-wiz-news",
+    "https://www.google.com/search?q=%EC%BC%80%EC%9D%B4%ED%8C%9D&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBjn6CZ1IBsOosjSXvG2ab5JDgWtfQ%3A1692328658405&ei=0uLeZI6eGPe22roP9OOTyAI&ved=0ahUKEwiOz5vEn-WAAxV3m1YBHfTxBCkQ4dUDCA0&uact=5&oq=%EC%BC%80%EC%9D%B4%ED%8C%9D&gs_lp=Egxnd3Mtd2l6LW5ld3MiCey8gOydtO2MnTILEAAYgAQYsQMYgwEyCxAAGIAEGLEDGIMBMgsQABiABBixAxiDATIFEAAYgAQyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABEiWnAFQ5oABWPSaAXAEeACQAQKYAcoBoAGiCKoBBTEuNy4xuAEDyAEA-AEBqAIAwgIIEAAYigUYkQLCAggQABiABBixA4gGAQ&sclient=gws-wiz-news",
+    "https://www.google.com/search?q=korean+entertainment&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBjFHL2wwksEtS-HmBF2MGIMo60ogw%3A1692328679740&ei=5-LeZMjULKDh2roPk8Sz6AQ&oq=korean+enter&gs_lp=Egxnd3Mtd2l6LW5ld3MiDGtvcmVhbiBlbnRlcioCCAAyCBAAGIoFGJECMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAESNB0UI82WKlucAV4AJABAJgB-gGgAYgOqgEGMi4xMi4xuAEDyAEA-AEBqAIAwgILEAAYgAQYsQMYgwHCAgQQABgDwgIIEAAYgAQYsQOIBgE&sclient=gws-wiz-news",
+    "https://www.google.com/search?q=k-drama&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBjzfOzNVnk5Yq08CxJM5VIKLGaxtA%3A1692328707149&ei=A-PeZJrZCODK2roPy9Cf8AY&ved=0ahUKEwja5rrbn-WAAxVgpVYBHUvoB24Q4dUDCA0&uact=5&oq=k-drama&gs_lp=Egxnd3Mtd2l6LW5ld3MiB2stZHJhbWEyBRAAGIAEMgUQABiABDIFEAAYgAQyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIHEAAYigUYQ0iYElD1BFjqEXABeACQAQCYAXegAZwFqgEDMC42uAEDyAEA-AEBqAIAwgIIEAAYigUYkQKIBgE&sclient=gws-wiz-news",
+    
 ]
-keywords = ["Korean entertainment", "K-pop", "Hallyu"]
+keywords = ["Korean entertainment", "K-pop", "Hallyu", "korean wave", "한류", "케이팝", "YG", "JYP", "SM", "K-drama", "Korea file", "korean movie"]
 
 # Function to filter relevant links
 def is_relevant(url, text):
@@ -33,7 +41,7 @@ queue = deque([(url, 1) for url in seed_urls])
 #     os.mkdir(output_folder)
 
 count = 1
-while queue and count <= 10:
+while queue and count <= 20:
     url, _ = queue.popleft()
 
     if url in visited:
