@@ -27,10 +27,10 @@ def score_url(text):
 # Web crawling loop
 visited = set()
 queue = deque([(url, 1) for url in seed_urls])
-output_folder = "collected_webpages"
+# output_folder = "collected_webpages"
 
-if not os.path.exists(output_folder):
-    os.mkdir(output_folder)
+# if not os.path.exists(output_folder):
+#     os.mkdir(output_folder)
 
 count = 1
 while queue and count <= 10:
@@ -59,11 +59,12 @@ while queue and count <= 10:
                     if is_relevant(absolute_url, link.text):
                         queue.append((absolute_url, score_url(link.text)))
 
-        file_path = os.path.join(output_folder, f"Hallyu_{count:01}.html")
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(response.text)
+        # file_path = os.path.join(output_folder, f"Hallyu_{count:01}.html")
+        # with open(file_path, "w", encoding="utf-8") as file:
+        #     file.write(response.text)
 
-        print(f"Downloaded {url} as {file_path}")
+        # print(f"Downloaded {url} as {file_path}")
+        print(f"Downloaded {url}")
 
         count += 1
 
@@ -74,11 +75,11 @@ with open("url_lists.txt", "w", encoding="utf-8") as file:
 
 print("Web crawling complete.")
 
-def zipdir(path, ziph):
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            ziph.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), path))
+# def zipdir(path, ziph):
+#     for root, dirs, files in os.walk(path):
+#         for file in files:
+#             ziph.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), path))
 
-with zipfile.ZipFile('webpages.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    zipdir('collected_webpages', zipf)
-    zipf.write('url_lists.txt')
+# with zipfile.ZipFile('webpages.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+#     zipdir('collected_webpages', zipf)
+#     zipf.write('url_lists.txt')
