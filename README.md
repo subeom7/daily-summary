@@ -1,5 +1,5 @@
 # Daily Summary
-daily news letter of your choice sent to your email
+daily news article sent to your email using web crawler
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
