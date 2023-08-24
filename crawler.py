@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
 import zipfile
+import json
 
 from langdetect import detect 
 
@@ -77,11 +78,15 @@ while queue and count <= 20:
         count += 1
 
 # Save the list of visited URLs
-with open("url_lists.txt", "w", encoding="utf-8") as file:
-    for url in visited:
-        file.write(url + "\n")
+# with open("url_lists.txt", "w", encoding="utf-8") as file:
+#     for url in visited:
+#         file.write(url + "\n")
+
+with open("url_lists.json", "w", encoding="utf-8") as file:
+    json.dump(list(visited), file)
 
 print("Web crawling complete.")
+print(json.dumps(list(visited)))
 
 # def zipdir(path, ziph):
 #     for root, dirs, files in os.walk(path):
