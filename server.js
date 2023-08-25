@@ -14,6 +14,8 @@ const API_KEY = process.env.API_KEY
 
 const connectionString = process.env.MONGO_CONNECTION
 
+const fs = require('fs');
+
 // sgMail.setApiKey(API_KEY)
 
 // Mongoose connection
@@ -118,17 +120,23 @@ app.post('/saveUser', async (req, res) => {
 // });
 
 //-----------------------------------------------------------
-const job = schedule.scheduleJob('0 8 * * *', function() {
+const job = schedule.scheduleJob('0 15 * * *', function() {
   sendDailyUpdates();
 });
 
 async function sendDailyUpdates() {
   try {
+    // Read URLs from the JSON file
+    const rawData = fs.readFileSync('url_lists.json', 'utf-8');
+    const visitedUrls = JSON.parse(rawData);
+
     const users = await User.find({});  // Retrieve all users from the database
 
     users.forEach(async user => {
       const userEmail = user.email;
-      const categories = user.categories.join('\n');
+
+      // Convert array of URLs to a string to send in the email body
+      const urlsToSend = visitedUrls.join('\n');
 
       let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -142,20 +150,18 @@ async function sendDailyUpdates() {
         await transporter.sendMail({
           from: '"SK" <subeomkwon@gmail.com>',
           to: userEmail,
-          subject: "Your Subscribed Categories",
-          text: categories,
-          html: `<b>${categories.replace(/\n/g, '<br>')}</b>`
+          subject: "Your Daily List of URLs",
+          text: `Here are your daily URLs related to your interests:\n${urlsToSend}`
         });
-      } catch (error) {
-        console.error(`Error sending email to ${userEmail}: ${error}`);
+      } catch (err) {
+        console.error(`Error sending email to ${userEmail}: ${err}`);
       }
     });
-
-    console.log("Daily updates sent!");
-  } catch (error) {
-    console.error(`Error fetching users from the database: ${error}`);
+  } catch (err) {
+    console.error(`Error in sending daily updates: ${err}`);
   }
 }
+
 
 app.listen(port, () => {
   console.log(`Server started and listening on port ${port}`)
