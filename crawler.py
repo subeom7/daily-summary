@@ -49,7 +49,7 @@ while queue and count <= 20:
         continue
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=3)  # 3 seconds timeout
     except requests.RequestException as e:
         print(f"Error downloading {url}: {e}")
         continue
@@ -82,11 +82,13 @@ while queue and count <= 20:
 #     for url in visited:
 #         file.write(url + "\n")
 
+filtered_visited = [url for url in visited if not url.startswith("https://www.google.com/search")]
+
 with open("url_lists.json", "w", encoding="utf-8") as file:
-    json.dump(list(visited), file)
+    json.dump(filtered_visited, file)
 
 print("Web crawling complete.")
-print(json.dumps(list(visited)))
+# print(json.dumps(list(visited)))
 
 # def zipdir(path, ziph):
 #     for root, dirs, files in os.walk(path):
