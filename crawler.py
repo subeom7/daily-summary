@@ -1,10 +1,7 @@
-import os
-import re
 import requests
 from bs4 import BeautifulSoup
 from collections import deque
 from urllib.parse import urljoin
-import zipfile
 import json
 
 from langdetect import detect 
@@ -36,10 +33,6 @@ def score_url(text):
 # Web crawling loop
 visited = set()
 queue = deque([(url, 1) for url in seed_urls])
-# output_folder = "collected_webpages"
-
-# if not os.path.exists(output_folder):
-#     os.mkdir(output_folder)
 
 count = 1
 while queue and count <= 20:
@@ -68,19 +61,8 @@ while queue and count <= 20:
                     if is_relevant(absolute_url, link.text):
                         queue.append((absolute_url, score_url(link.text)))
 
-        # file_path = os.path.join(output_folder, f"Hallyu_{count:01}.html")
-        # with open(file_path, "w", encoding="utf-8") as file:
-        #     file.write(response.text)
-
-        # print(f"Downloaded {url} as {file_path}")
         print(f"Downloaded {url}")
-
         count += 1
-
-# Save the list of visited URLs
-# with open("url_lists.txt", "w", encoding="utf-8") as file:
-#     for url in visited:
-#         file.write(url + "\n")
 
 filtered_visited = [url for url in visited if not url.startswith("https://www.google.com/search")]
 
@@ -88,13 +70,3 @@ with open("url_lists.json", "w", encoding="utf-8") as file:
     json.dump(filtered_visited, file)
 
 print("Web crawling complete.")
-# print(json.dumps(list(visited)))
-
-# def zipdir(path, ziph):
-#     for root, dirs, files in os.walk(path):
-#         for file in files:
-#             ziph.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), path))
-
-# with zipfile.ZipFile('webpages.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-#     zipdir('collected_webpages', zipf)
-#     zipf.write('url_lists.txt')

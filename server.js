@@ -16,8 +16,6 @@ const connectionString = process.env.MONGO_CONNECTION
 
 const fs = require('fs');
 
-// sgMail.setApiKey(API_KEY)
-
 // Mongoose connection
 mongoose.connect(connectionString, {
   useNewUrlParser: true,
@@ -35,19 +33,6 @@ const userSchema = new Schema({
 });
 
 const User = model('User', userSchema);
-
-//testing, needs to be sent to every email stored in database in the future
-// const message = {
-//   to: 'subeom7@vt.edu',
-//   from: 'subeom7@vt.edu',
-//   subject: 'Hello from sendGrid',
-//   text: 'Hello from sendGrid',
-//   html: '<h1>Hello from sendGrid</h1>'
-// }
-
-// sgMail.send(message)
-// .then(response => console.log('Email Sent!'))
-// .catch(error => console.log(err.message))
 
 app.use(cors());
 app.use(express.json()); // Built-in middleware to parse incoming json
@@ -78,49 +63,7 @@ app.post('/saveUser', async (req, res) => {
   }
 });
 
-// app.post('/sendEmail', async (req, res) => {
-//   const userEmail = req.body.userEmail;
-
-//   let user;
-//   try {
-//     user = await User.findOne({ email: userEmail });
-//     if (!user) {
-//       return res.status(404).send('User not found');
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).send('Error fetching user');
-//   }
-
-//   const categories = user.categories.join('\n');  // Joining categories with new line
-
-//   let transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//       user: process.env.GMAIL_USER,
-//       pass: process.env.GMAIL_PASS
-//     }
-//   });
-
-//   let info;
-//   try {
-//     info = await transporter.sendMail({
-//       from: '"SK" <subeomkwon@gmail.com>', // sender address
-//       to: userEmail, // list of receivers
-//       subject: "Your Subscribed Categories", // Subject line
-//       text: categories, // Sending categories in plain text
-//       html: `<b>${categories.replace(/\n/g, '<br>')}</b>`, // Replacing new lines with <br> for HTML version
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).send('Error sending email');
-//   }
-
-//   res.send('Email sent!');
-// });
-
-//-----------------------------------------------------------
-const job = schedule.scheduleJob('0 15 * * *', function() {
+const job = schedule.scheduleJob('11 14 * * *', function() {
   sendDailyUpdates();
 });
 
