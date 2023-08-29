@@ -16,7 +16,7 @@ seed_urls = [
     "https://www.google.com/search?q=k-drama&sca_esv=557985309&biw=2752&bih=1035&tbm=nws&sxsrf=AB5stBjzfOzNVnk5Yq08CxJM5VIKLGaxtA%3A1692328707149&ei=A-PeZJrZCODK2roPy9Cf8AY&ved=0ahUKEwja5rrbn-WAAxVgpVYBHUvoB24Q4dUDCA0&uact=5&oq=k-drama&gs_lp=Egxnd3Mtd2l6LW5ld3MiB2stZHJhbWEyBRAAGIAEMgUQABiABDIFEAAYgAQyBxAAGIoFGEMyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIHEAAYigUYQ0iYElD1BFjqEXABeACQAQCYAXegAZwFqgEDMC42uAEDyAEA-AEBqAIAwgIIEAAYigUYkQKIBgE&sclient=gws-wiz-news",
     
 ]
-keywords = ["Korean entertainment", "K-pop", "Hallyu", "korean wave", "한류", "케이팝", "YG", "JYP", "SM", "K-drama", "Korea file", "korean movie"]
+keywords = ["Korean entertainment", "K-pop", "Hallyu", "korean wave", "한류", "케이팝", "YG", "JYP", "SM", "K-drama", "Korea file", "korean movie", "k-series"]
 
 # Function to filter relevant links
 def is_relevant(url, text):
@@ -31,14 +31,17 @@ def score_url(text):
     return keyword_count / len(keywords)
 
 # Web crawling loop
-visited = set()
-queue = deque([(url, 1) for url in seed_urls])
+visited = []
+queue = deque([{"url": url, "title": "seed"} for url in seed_urls])
 
 count = 1
-while queue and count <= 20:
-    url, _ = queue.popleft()
+while queue and count <= 10:
+    current = queue.popleft()
 
-    if url in visited:
+    url = current["url"]
+    title = current["title"]
+
+    if any(item['url'] == url for item in visited):
         continue
 
     try:
@@ -47,7 +50,7 @@ while queue and count <= 20:
         print(f"Error downloading {url}: {e}")
         continue
 
-    visited.add(url)
+    visited.append({"url": url, "title": title})
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -57,16 +60,14 @@ while queue and count <= 20:
             href = link.get("href")
             if href and not href.startswith("javascript:") and not href.startswith("#"):
                 absolute_url = urljoin(url, href)
-                if absolute_url not in visited:
-                    if is_relevant(absolute_url, link.text):
-                        queue.append((absolute_url, score_url(link.text)))
+                link_text = link.text or "untitled"
+                if absolute_url not in [item['url'] for item in visited] and is_relevant(absolute_url, link_text):
+                    queue.append({"url": absolute_url, "title": link_text})
 
-        print(f"Downloaded {url}")
+        print(f"Downloaded {url} with title {title}")
         count += 1
 
-filtered_visited = [url for url in visited if not url.startswith("https://www.google.com/search")]
-
 with open("url_lists.json", "w", encoding="utf-8") as file:
-    json.dump(filtered_visited, file)
+    json.dump(visited, file)
 
 print("Web crawling complete.")
