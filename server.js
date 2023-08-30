@@ -4,13 +4,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const app = express();
-const sgMail = require('@sendgrid/mail')
 
 require('dotenv').config();
 
 const port = 5000;
-
-const API_KEY = process.env.API_KEY
 
 const connectionString = process.env.MONGO_CONNECTION
 
