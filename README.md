@@ -1,5 +1,5 @@
 # Daily Summary
-Daily news article sent to your email using web crawler
+Daily news article sent to your email using python web crawler
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
